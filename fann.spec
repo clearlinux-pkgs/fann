@@ -4,7 +4,7 @@
 #
 Name     : fann
 Version  : 2.2.0
-Release  : 1
+Release  : 2
 URL      : https://github.com/libfann/fann/archive/2.2.0.tar.gz
 Source0  : https://github.com/libfann/fann/archive/2.2.0.tar.gz
 Summary  : No detailed summary available
@@ -50,7 +50,7 @@ lib components for the fann package.
 %build
 mkdir clr-build
 pushd clr-build
-cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS:BOOL=ON -DLIB_INSTALL_DIR:PATH=%{_libdir}
+cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS:BOOL=ON -DLIB_INSTALL_DIR:PATH=%{_libdir} -DLIB_SUFFIX=64
 make V=1  %{?_smp_mflags}
 popd
 
@@ -66,9 +66,9 @@ popd
 %files dev
 %defattr(-,root,root,-)
 /usr/include/*.h
-/usr/lib/*.so
+/usr/lib64/*.so
 /usr/lib64/pkgconfig/*.pc
 
 %files lib
 %defattr(-,root,root,-)
-/usr/lib/*.so.*
+/usr/lib64/*.so.*
