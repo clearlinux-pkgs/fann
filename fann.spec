@@ -4,7 +4,7 @@
 #
 Name     : fann
 Version  : 2.2.0
-Release  : 2
+Release  : 3
 URL      : https://github.com/libfann/fann/archive/2.2.0.tar.gz
 Source0  : https://github.com/libfann/fann/archive/2.2.0.tar.gz
 Summary  : No detailed summary available
@@ -50,6 +50,13 @@ lib components for the fann package.
 %build
 mkdir clr-build
 pushd clr-build
+export AR=gcc-ar
+export RANLIB=gcc-ranlib
+export NM=gcc-nm
+export CFLAGS="$CFLAGS -flto -O3 -falign-functions=32 -fno-semantic-interposition "
+export FCFLAGS="$CFLAGS -flto -O3 -falign-functions=32 -fno-semantic-interposition "
+export FFLAGS="$CFLAGS -flto -O3 -falign-functions=32 -fno-semantic-interposition "
+export CXXFLAGS="$CXXFLAGS -flto -O3 -falign-functions=32 -fno-semantic-interposition "
 cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS:BOOL=ON -DLIB_INSTALL_DIR:PATH=%{_libdir} -DLIB_SUFFIX=64
 make V=1  %{?_smp_mflags}
 popd
