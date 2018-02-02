@@ -4,7 +4,7 @@
 #
 Name     : fann
 Version  : d71d54788bee56ba4cf7522801270152da5209d7
-Release  : 5
+Release  : 6
 URL      : https://github.com/libfann/fann/archive/d71d54788bee56ba4cf7522801270152da5209d7.tar.gz
 Source0  : https://github.com/libfann/fann/archive/d71d54788bee56ba4cf7522801270152da5209d7.tar.gz
 Summary  : No detailed summary available
