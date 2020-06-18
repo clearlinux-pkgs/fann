@@ -4,14 +4,18 @@
 #
 Name     : fann
 Version  : d71d54788bee56ba4cf7522801270152da5209d7
-Release  : 9
+Release  : 10
 URL      : https://github.com/libfann/fann/archive/d71d54788bee56ba4cf7522801270152da5209d7.tar.gz
 Source0  : https://github.com/libfann/fann/archive/d71d54788bee56ba4cf7522801270152da5209d7.tar.gz
 Summary  : No detailed summary available
 Group    : Development/Tools
 License  : AGPL-3.0 BSD-3-Clause LGPL-2.1
-Requires: fann-lib
+Requires: fann-lib = %{version}-%{release}
+Requires: fann-license = %{version}-%{release}
+BuildRequires : buildreq-cmake
 BuildRequires : cmake
+BuildRequires : glibc-dev
+BuildRequires : python3
 
 %description
 # Fast Artificial Neural Network Library
@@ -21,8 +25,9 @@ BuildRequires : cmake
 %package dev
 Summary: dev components for the fann package.
 Group: Development
-Requires: fann-lib
-Provides: fann-devel
+Requires: fann-lib = %{version}-%{release}
+Provides: fann-devel = %{version}-%{release}
+Requires: fann = %{version}-%{release}
 
 %description dev
 dev components for the fann package.
@@ -31,46 +36,97 @@ dev components for the fann package.
 %package lib
 Summary: lib components for the fann package.
 Group: Libraries
+Requires: fann-license = %{version}-%{release}
 
 %description lib
 lib components for the fann package.
 
 
+%package license
+Summary: license components for the fann package.
+Group: Default
+
+%description license
+license components for the fann package.
+
+
 %prep
 %setup -q -n fann-d71d54788bee56ba4cf7522801270152da5209d7
+cd %{_builddir}/fann-d71d54788bee56ba4cf7522801270152da5209d7
 
 %build
-mkdir clr-build
+export http_proxy=http://127.0.0.1:9/
+export https_proxy=http://127.0.0.1:9/
+export no_proxy=localhost,127.0.0.1,0.0.0.0
+export LANG=C.UTF-8
+export SOURCE_DATE_EPOCH=1592443046
+mkdir -p clr-build
 pushd clr-build
+export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
-export CFLAGS="$CFLAGS -flto -O3 -fno-semantic-interposition -falign-functions=32 "
-export FCFLAGS="$CFLAGS -flto -O3 -fno-semantic-interposition -falign-functions=32 "
-export FFLAGS="$CFLAGS -flto -O3 -fno-semantic-interposition -falign-functions=32 "
-export CXXFLAGS="$CXXFLAGS -flto -O3 -fno-semantic-interposition -falign-functions=32 "
-cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS:BOOL=ON -DLIB_INSTALL_DIR:PATH=%{_libdir} -DLIB_SUFFIX=64
-make V=1  %{?_smp_mflags}
+export CFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
+export FCFLAGS="$FFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
+export FFLAGS="$FFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
+export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
+%cmake .. -DLIB_SUFFIX=64
+make  %{?_smp_mflags}  VERBOSE=1
 popd
 
 %install
+export SOURCE_DATE_EPOCH=1592443046
 rm -rf %{buildroot}
+mkdir -p %{buildroot}/usr/share/package-licenses/fann
+cp %{_builddir}/fann-d71d54788bee56ba4cf7522801270152da5209d7/LICENSE.md %{buildroot}/usr/share/package-licenses/fann/8f1a637d2e2ed1bdb9eb01a7dccb5c12cc0557e1
+cp %{_builddir}/fann-d71d54788bee56ba4cf7522801270152da5209d7/docs/NaturalDocs-1.52/License.txt %{buildroot}/usr/share/package-licenses/fann/42b28ce2d6797c67befac7f47501491663abdc44
+cp %{_builddir}/fann-d71d54788bee56ba4cf7522801270152da5209d7/lib/googletest/LICENSE %{buildroot}/usr/share/package-licenses/fann/5a2314153eadadc69258a9429104cd11804ea304
 pushd clr-build
 %make_install
 popd
 
 %files
 %defattr(-,root,root,-)
-/usr/lib64/cmake/fann/fann-config.cmake
-/usr/lib64/cmake/fann/fann-use.cmake
 
 %files dev
 %defattr(-,root,root,-)
-/usr/include/*.h
-/usr/include/*.hpp
-/usr/lib64/*.so
-/usr/lib64/pkgconfig/*.pc
+/usr/include/doublefann.h
+/usr/include/fann.h
+/usr/include/fann_activation.h
+/usr/include/fann_cascade.h
+/usr/include/fann_cpp.h
+/usr/include/fann_data.h
+/usr/include/fann_data_cpp.h
+/usr/include/fann_error.h
+/usr/include/fann_internal.h
+/usr/include/fann_io.h
+/usr/include/fann_train.h
+/usr/include/fann_training_data_cpp.h
+/usr/include/fixedfann.h
+/usr/include/floatfann.h
+/usr/include/parallel_fann.h
+/usr/include/parallel_fann.hpp
+/usr/lib64/cmake/fann/fann-config.cmake
+/usr/lib64/cmake/fann/fann-use.cmake
+/usr/lib64/libdoublefann.so
+/usr/lib64/libfann.so
+/usr/lib64/libfixedfann.so
+/usr/lib64/libfloatfann.so
+/usr/lib64/pkgconfig/fann.pc
 
 %files lib
 %defattr(-,root,root,-)
-/usr/lib64/*.so.*
+/usr/lib64/libdoublefann.so.2
+/usr/lib64/libdoublefann.so.2.2.0
+/usr/lib64/libfann.so.2
+/usr/lib64/libfann.so.2.2.0
+/usr/lib64/libfixedfann.so.2
+/usr/lib64/libfixedfann.so.2.2.0
+/usr/lib64/libfloatfann.so.2
+/usr/lib64/libfloatfann.so.2.2.0
+
+%files license
+%defattr(0644,root,root,0755)
+/usr/share/package-licenses/fann/42b28ce2d6797c67befac7f47501491663abdc44
+/usr/share/package-licenses/fann/5a2314153eadadc69258a9429104cd11804ea304
+/usr/share/package-licenses/fann/8f1a637d2e2ed1bdb9eb01a7dccb5c12cc0557e1
